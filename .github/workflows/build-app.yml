@@ -27,7 +27,7 @@ jobs:
       - name: Print environment name
         if: ${{ github.event.inputs.environment == 'dev' || github.event_name == 'push' }}
         run: |
-          echo "El entorno actual es: ${ { github.event.inputs.environment || 'dev' } }"
+          echo "El entorno actual es: ${{ github.event.inputs.environment || 'dev' }}"
 
       # 4. El workflow debe compilar una aplicación de cualquier tecnología (Node.js)
       - name: Setup Node.js
