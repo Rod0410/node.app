@@ -1,0 +1,49 @@
+name: Build App
+
+# 2. El workflow debe ejecutarse manualmente y a través de un push a la rama main
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    # 3. Se debe recibir un parámetro de entrada llamado environment como input, colocar por defecto dev
+    inputs:
+      environment:
+        description: 'Ambiente de despliegue'
+        required: true
+        default: 'dev'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Clonar el código 
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # 6. Implementar una tarea que imprima el nombre del environment (solo cuando es dev)
+      - name: Print environment name
+        if: ${{ github.event.inputs.environment == 'dev' || github.event_name == 'push' }}
+        run: |
+          echo "El entorno actual es: ${ { github.event.inputs.environment || 'dev' } }"
+
+      # 4. El workflow debe compilar una aplicación de cualquier tecnología (Node.js)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Instalamos dependencias y ejecutamos el comando de compilación que creamos en el package.json
+      - name: Install dependencies and Build
+        run: |
+          npm install
+          npm run build
+
+      # 5. Debes subir el artefacto al workflow
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-artifact
+          path: dist/
